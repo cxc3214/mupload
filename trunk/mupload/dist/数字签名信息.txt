@@ -1,0 +1,8 @@
+名字与姓氏：mupload
+组织单位名称：mjc
+组织名称：mjc
+所在的城市或区域名称：hz
+所在的州或省份：zj
+国家代码：cn
+
+keystore和主密码为：mupload
