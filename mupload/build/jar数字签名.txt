@@ -1,0 +1,15 @@
+1.使用mupload-packager.bat打包程序打包mupload为jar文件；
+
+2.进入到mjc-mupload.jar的生成目录，键入如下命令：
+  keytool -genkey -keystore mjc-mupload.store -alias mupload
+  根据提示输入keystore的密码、你的姓名、组织单位等信息，注意密码要记牢，后面将用到！最后输入y确认信息，直接回车设置主密码和store密码一致。
+
+3.生成keystore后，再键入如下命令：
+  keytool -export -keystore mjc-mupload.store -alias mupload -file mjc-mupload.cert
+  命令执行后提示输入keystore的密码，就是我们在第2步中输入的密码，我们输入正确后回车，然后我们会在目录下发现一个证书文件：mjc-mupload.cert
+
+4.然后再键入如下命令：
+  jarsigner -keystore mjc-mupload.store mjc-mupload.jar mupload
+  命令执行后提示输入密钥库的口令短语，也就是我们第2步中设置的密码，输入正确后回车,接着会提示：警告：签名者证书将在六个月内过期。表示我们的数字签名已经完毕！
+
+5.拷贝mjc-mupload.jar文件和mjc-mupload.js文件到你的发布目录即可。

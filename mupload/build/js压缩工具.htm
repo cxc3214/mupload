@@ -1,0 +1,281 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0038)http://lomi.zj.com/test/yashuoNew.html -->
+<HTML><HEAD><TITLE>程序注释删除工具</TITLE>
+<META http-equiv=Content-Type content="text/html; charset=gb2312">
+<SCRIPT language=javascript defer>
+<!--
+/*
+*************************************************************************************************
+黄贤彬——广西
+email:lin-feng-ruo@163.com
+版本：1.1
+2007.3.23
+*************************************************************************************************/
+function YaSHU()
+{
+	this.Y=true;
+	var tmpWord=new Array();
+	var MenWord=new Array();
+	var Ju=new Array();
+	var i=0;
+	var testnum=0
+	function getRoundText(text,str1)
+	{
+		var tmps="";
+		var str=str1.toString();
+		for(var i=0;i<str.length;i++)
+		{
+			tmps=str.charAt(i).toString()+tmps;
+		}
+		var s=str+Math.round(Math.random()*10000).toString()+tmps;
+		while(text.indexOf(s)!=-1)
+		{
+			s=str+Math.round(Math.random()*10000).toString()+tmps;
+		}
+		return s;
+	}
+	function MadeRound(t,c,s)//制造临时常量
+	//第一个参数是全局S，第二个参数是制造数量，第三个参数是种子
+	{
+		for(i=0;i<c;i++)
+		{
+			tmpWord[i]=getRoundText(t,s.toString()+i.toString());
+		}
+	}
+	function changZhuanYi(t)//转换转义字符
+	{
+		t=t.replace(/\\\'/g,tmpWord[0]);//转义字符\'
+     	t=t.replace(/\\\"/g,tmpWord[1]);//转义字符\"
+     	t=t.replace(/\\\//g,tmpWord[2]);//转义字符\/
+		return t;
+	}
+	function YaJin(t)//保存单双引号
+	{
+		var tmp=tmp=/((["|']).+?\2)/;
+		while(tmp.test(t))
+		{
+			t=t.replace(tmp,"$"+tmpWord[3]+"#"+MenWord.length+"$");
+			MenWord[MenWord.length]=RegExp.$1;
+		}
+		return t;
+	}
+	function HuanYuan(t)//还原单双引号
+	{
+		for(var i=MenWord.length-1;;i--)
+		{
+			if(i<0)break;
+			t=t.replace("$"+tmpWord[3]+"#"+i+"$",MenWord[i]);
+		}
+		return t;
+	}
+	function ReZhuanyi(t)//返回转义字符
+	{
+		var tmp;
+		tmp=RegExp(tmpWord[0],"g");
+     	t=t.replace(tmp,"\\\'");
+		tmp=RegExp(tmpWord[1],"g");
+     	t=t.replace(tmp,"\\\""); 
+		tmp=RegExp(tmpWord[2],"g");
+     	t= t.replace(tmp,"\\\/") ;
+		return t;
+	}
+	function ZhengZhe(t)//保存正则的内容
+	{
+		var tmp=/((\/(?!\d))[^\n\/]+?\2)/;
+		while(tmp.test(t))
+		{
+			t=t.replace(tmp,"$"+tmpWord[3]+"#"+MenWord.length+"$");
+			MenWord[MenWord.length]=RegExp.$1;
+		}
+		return t;
+	}
+	function delNotes(t)
+	{
+		var tmp;//删除注释--注释"//"
+		tmp=/\/{2,}.*/g;
+		t=t.replace(tmp,""); 
+     	tmp=RegExp("\\/\\*[\\s\\S]*?\\*\\/","gi");//注释"/*notes*/" 
+     	t=t.replace(tmp,"");
+		t=t.replace(/[\n\x0a\x0d][\n\x0a\x0d\t ]*[\n\x0a\x0d]/g,"\n");//删除空行
+		t=t.replace(/[\t ]+[\n\x0a\x0d]/g,"\n");//删除行末的空格
+		return t;
+	}
+	function delSpace(t)//删除行前的空格和制表符
+	{
+		t=t.replace(/[\n\x0d\x0a][\t ]*/g,"\n");
+		return t;
+	}
+	function huaKuo(t)
+	{
+		t=t.replace(/[\n\t\x0d\x0a ]+\{/g,"{");//粘上上一句
+		t=t.replace(/[\n\t\x0d\x0a ]+\}/g,"}");//粘上上一句
+		t=t.replace(/[\n\t\x0d\x0a ]+\)/g,")");//粘上上一句
+		t=t.replace(/[\n\t\x0d\x0a ]+\(/g,"(");//粘上上一句
+		t=t.replace(/[\n\t\x0d\x0a ]*,[\n\t\x0d\x0a ]*/g,",");//逗号处理
+		return t;
+	}
+	///////////////////////////////////////
+	function init(t)
+	{
+		MadeRound(t,5,"zy");
+		t=changZhuanYi(t);
+		t=YaJin(t);
+		t=delNotes(t);
+		return t;
+	}
+	function end(t)
+	{
+		t=HuanYuan(t);
+		t=ReZhuanyi(t);
+		return t;
+	}
+	function pagding(t)
+	{
+		t=t.replace(/\\[\x0a\x0d]/g,"");//行未为\
+		return t;
+	}
+	/*-----------------------------------*/
+	function ZhuJuYa(t)
+	{
+		var tmp=/([\S\t ]+)/;
+		while(tmp.test(t))//逐句压入数组
+		{
+			t=t.replace(tmp,"\n");
+			Ju[Ju.length]=RegExp.$1
+		}
+	}
+	function testkuoHao(s)
+	{
+	///////////////////////////////////////////////////////////////
+		function test(s)
+		{
+			var arr;
+			var flag=false;
+			var count=0;
+			var tmp=/(\(|\))/g
+			while((arr=tmp.exec(s))!=null)
+			{
+				if(arr[1]=="(")
+				{
+					count++;
+					flag=true;
+				}
+				else if(arr[1]==")" && flag==true){
+					count--;
+					if(count==0){
+						if(arr.lastIndex==s.length){
+							return true;
+						}else{
+							return false;
+						}
+					}
+				}
+			}
+			return false;
+		}
+		var tmpArr;
+		var tmp1,tmp2;
+		tmp1=/\b(if|while|for)\b/g;
+		//tmp2=/\b(for|while)\b/g;
+		if(/\b(if|while|for)\b/.test(s))
+		{
+			while((tmpArr=tmp1.exec(s))!=null)
+			{
+				if(test(s.substr(tmpArr.index)))return true;
+			}
+		}	
+		return false;
+	}
+	function ZhuJuTest(t,j)
+	{
+		if(/.*?[;=]$/.test(t))return t;//以冒号结束返回
+		///以两个＋＋或--结尾，则加入；
+		if(/.*?([\+\-])\1$/.test(t))return t+";";
+		if(/.*?[\{\+\-\\]$/.test(t))return t;//如果是以运算符为结尾
+		if(/else$/.test(t))return t+" ";//如果以Else为结尾
+		//如果有下一句，下一句以运算符为开头,(以下均与下一句相关)
+		if( !Ju[j+1]||(/^([\+\-=])(?!\1)/.test(Ju[j+1])))return t;
+		if(/.*?\}$/.test(t))//如果以}为结尾
+		{
+			if(/^else\b/.test(Ju[j+1]))return t;//如果下一行为Else 开头
+		}
+		//末尾是：并且下一句不是Case
+		if(/.*?\:$/.test(t) &&( !/^case\b/.test(Ju[j+1])))return t;
+		//含for if while并以右括号）结尾
+		if(/.*?\)$/.test(t) && /\b(for|if|while)\b/.test(t))
+		{
+			if(testkuoHao(t))return t;
+		}
+		return t+";"//添加一个冒号
+	}
+	function ZhuJu(t)
+	{
+		ZhuJuYa(t);
+		var s="";
+		for(var i=0;i<Ju.length;i++)
+		{
+			Ju[i]=ZhuJuTest(Ju[i],i);
+			//alert(Ju[i]+i)重新组合为一个字串
+			s+=Ju[i]//+"\n";
+		}
+		return s;
+	}
+	///////////////////////////////////////
+	this.RUN=function(t)
+	{
+		t=init(t);
+		////压缩操作////////////////////////
+		if(this.Y)
+		{
+			t=delSpace(t);//删除行前的空格
+			t=pagding(t);
+			t=ZhengZhe(t);//保存正则
+			t=t.replace(/[\t ]/g," ");
+			t=huaKuo(t);//压花括号
+			
+			t=ZhuJu(t);//智能逐句分析
+		}
+		///////////////////////////
+		t=end(t);	
+		return t;
+	}
+	
+}
+//-->
+</SCRIPT>
+
+<META content="MSHTML 6.00.2900.3086" name=GENERATOR></HEAD>
+<BODY bgColor=#c0c0c0>
+<TABLE id=table1 style="BORDER-COLLAPSE: collapse" height=346 cellPadding=0 
+width="100%" border=0>
+  <TBODY>
+  <TR>
+    <TD align=middle height=34><FONT color=#00ffff 
+size=6>程序注释删除工具</FONT></TD></TR>
+  <TR>
+    <TD align=middle height=162><TEXTAREA id=sources ondblclick=this.select(); name=S1 rows=12 cols=86></TEXTAREA></TD></TR>
+  <TR>
+    <TD align=middle>
+      <TABLE id=table2 cellSpacing=0 cellPadding=0 width=760 border=0>
+        <TBODY>
+        <TR>
+          <TD width=104>　</TD>
+          <TD>压缩 <LABEL>JS <INPUT id=m type=checkbox value=checkbox 
+            name=checkbox> </LABEL></TD>
+          <TD><INPUT onclick=test() type=button value=删除注释 name=B1></TD>
+          <TD width=195>　双击选择文本</TD></TR></TBODY></TABLE></TD></TR>
+  <TR>
+    <TD align=middle><TEXTAREA id=target ondblclick=this.select(); name=S2 rows=12 cols=86></TEXTAREA></TD></TR></TBODY></TABLE>
+<SCRIPT language=javascript>
+function $(_id)
+{
+	return document.getElementById(_id);
+}
+function test(){
+	var oo=new YaSHU();
+	if($("m").checked==true)oo.Y=true;
+	else oo.Y=false;
+	$("target").value=oo.RUN($("sources").value);
+}
+</SCRIPT>
+</BODY></HTML>

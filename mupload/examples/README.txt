@@ -1,0 +1,1 @@
+这里只提供了java版本的服务端测试，请将java目录下的web目录设置为tomcat或resin和根目录，然后启动运行tomcat或resin即可！
