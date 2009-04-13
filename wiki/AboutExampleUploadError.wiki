@@ -12,9 +12,9 @@
     可以参考看下代码中关于获取上传URL的代码片段就可以知道原因了：
 {{{
 private String getUploadURL() {
-    String httpURL = StringUtil.trim(this.setting.getHttpURL());
+    String httpURL = StringUtil.trim(this.setting.getHttpURL()); // 这个就是我们设置的URL
     if (httpURL.startsWith("http://")) return httpURL;
-    URL doc = this.setting.getDocBase();
+    URL doc = this.setting.getDocBase(); // 这个是获取当前包含控件的页面URL
     String base = "http://" + doc.getHost() + (doc.getPort() == -1 ? "" : (":" + doc.getPort()));
     if (httpURL.startsWith("/")) return base + httpURL;
     String path = StringUtil.trim(doc.getPath()).intern();
