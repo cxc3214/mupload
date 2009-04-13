@@ -9,8 +9,8 @@
 
     关于示例在某些情况下无法上传的问题，这个主要是因为你没有将示例的WEB目录设置为resin或tomcat等服务器的*ROOT根目录*，否则运行时获取的URL地址因为没有包含context path而出错。
 
-    可以参考看下代码中关于获取上传URL的代码片段：
-
+    可以参考看下代码中关于获取上传URL的代码片段就可以知道原因了：
+{{{
 private String getUploadURL() {
     String httpURL = StringUtil.trim(this.setting.getHttpURL());
     if (httpURL.startsWith("http://")) return httpURL;
@@ -23,3 +23,4 @@ private String getUploadURL() {
     if (index <= 0) return base + "/" + httpURL;
     return base + path.substring(0, index) + "/" + httpURL;
 }
+}}}
